@@ -1,13 +1,19 @@
-import User from './User.dictionary';
+import React from 'react';
+import './User.css';
 
-const user = ({name, age, city}: User) => {
+import { Name } from '../../App.dictionary';
+
+const User = ({ name, city, age, picture }: { name: Name, city: string, age: number, picture: string }) => {
     return (
-        <div>
-            <h1>{name}</h1>
-            <p>{age}</p>
-            <p>{city}</p>
+        <div className="user-profile">
+            <img src={picture} />
+            <div className="user-profile-information">
+                <h2>{`${name.title} ${name.first} ${name.last}`}</h2>
+                <p>{`age: ${age}`}</p>
+                <p>{`city: ${city}`}</p>
+            </div>
         </div>
     );
 };
 
-export default user;
+export default User;
