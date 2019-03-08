@@ -1,24 +1,23 @@
-.user-profile {
-  display: flex;
-  align-items: flex-start;
-  width: 350px;
-  margin: 10px auto;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.user-profile-information {
-  width: 100%; 
-  text-align: center;
-}
-
 img {
   max-width: 100%;
   padding: 20px;
   border-radius: 50%;
 }
 
-h2, p {
-  text-transform: capitalize;
+.user-profile {
+  display: flex;
+  align-items: flex-start;
+  width: 350px;
+  margin: 15px auto;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.user-profile-information {
+  width: 100%;
+}
+
+.user-profile-information p {
+  color: gray;
 }
