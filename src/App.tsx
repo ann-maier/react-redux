@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import './App.css';
-import { REQUEST_URL, User } from './App.dictionary';
+import { REQUEST_URL, SEARCH_NAME_TEMPLATE, SEARCH_CITY_TEMPLATE, User } from './App.dictionary';
 
 import UserComponent from './components/user/User';
 import SearchBarComponent from './components/search-bar/SearchBar';
@@ -14,7 +14,8 @@ interface State {
   users: User[],
   filteredUsers: User[],
   isLoadingFailed: boolean,
-  searchInput: string
+  searchNameInput: string,
+  searchCityInput: string
 }
 
 class App extends Component<{}, State> {
@@ -22,13 +23,20 @@ class App extends Component<{}, State> {
     users: [],
     filteredUsers: [],
     isLoadingFailed: false,
-    searchInput: ''
+    searchNameInput: '',
+    searchCityInput: ''
   };
 
-  handleOnChange(input: string): void {
-    const filteredUsers = this.state.users.filter((user: User) => user.name.first.includes(input));
+  handleOnChange(input: string, searchType: string): void {
+    const filteredUsers = this.state.users.filter((user: User) => searchType === SEARCH_NAME_TEMPLATE
+      ? user.name.first.includes(input)
+      : user.location.city.includes(input));
 
-    this.setState({ filteredUsers, searchInput: input });
+    this.setState({
+      filteredUsers,
+      searchNameInput: searchType === SEARCH_NAME_TEMPLATE ? input : '',
+      searchCityInput: searchType === SEARCH_CITY_TEMPLATE ? input : ''
+    });
   }
 
   getUsers(users: User[]): JSX.Element[] {
@@ -49,11 +57,13 @@ class App extends Component<{}, State> {
   }
 
   render() {
+    const searchInput: string = this.state.searchNameInput || this.state.searchCityInput;
     let users: JSX.Element | JSX.Element[];
-    if (this.state.searchInput && this.state.filteredUsers.length) {
+
+    if (searchInput && this.state.filteredUsers.length) {
       users = this.getUsers(this.state.filteredUsers);
     }
-    else if (this.state.searchInput && !this.state.filteredUsers.length) {
+    else if (searchInput && !this.state.filteredUsers.length) {
       users = NO_SEARCH_RESULTS_TEMPLATE;
     }
     else {
@@ -66,10 +76,19 @@ class App extends Component<{}, State> {
           this.state.isLoadingFailed
             ? LOADING_ERROR_TEMPLATE
             : (
-              <div>
-                <SearchBarComponent handleOnChange={this.handleOnChange.bind(this)} />
+              <React.Fragment>
+                <div className="input-wrapper">
+                  <SearchBarComponent
+                    searchType={SEARCH_NAME_TEMPLATE}
+                    searchInput={this.state.searchNameInput}
+                    handleOnChange={this.handleOnChange.bind(this)} />
+                  <SearchBarComponent
+                    searchType={SEARCH_CITY_TEMPLATE}
+                    searchInput={this.state.searchCityInput}
+                    handleOnChange={this.handleOnChange.bind(this)} />
+                </div>
                 {users}
-              </div>
+              </React.Fragment>
             )
         }
       </div>

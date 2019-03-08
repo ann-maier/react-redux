@@ -2,3 +2,8 @@
   text-align: center;
   text-transform: capitalize;
 }
+
+.input-wrapper {
+  display: flex;
+  justify-content: center;
+}
