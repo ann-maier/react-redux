@@ -9,9 +9,9 @@ const User = ({ name, city, age, picture }: { name: Name, city: string, age: num
         <div className="user-profile">
             <img src={picture} />
             <div className="user-profile-information">
-                <h2>{`${name.title} ${name.first} ${name.last}`}</h2>
-                <p>{`age: ${age}`}</p>
-                <p>{`city: ${city}`}</p>
+                <h2>{name.title} {name.first} {name.last}</h2>
+                <p>age: {age}</p>
+                <p>city: {city}</p>
             </div>
         </div>
     );

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 import './App.css';
 import { REQUEST_URL, SEARCH_NAME_TEMPLATE, SEARCH_CITY_TEMPLATE, User } from './App.dictionary';
@@ -12,7 +13,6 @@ const NO_SEARCH_RESULTS_TEMPLATE: JSX.Element = <h1>Ooops...</h1>;
 
 interface State {
   users: User[],
-  filteredUsers: User[],
   isLoadingFailed: boolean,
   searchNameInput: string,
   searchCityInput: string
@@ -21,21 +21,15 @@ interface State {
 class App extends Component<{}, State> {
   state = {
     users: [],
-    filteredUsers: [],
     isLoadingFailed: false,
     searchNameInput: '',
     searchCityInput: ''
   };
 
-  handleOnChange(input: string, searchType: string): void {
-    const filteredUsers = this.state.users.filter((user: User) => searchType === SEARCH_NAME_TEMPLATE
-      ? user.name.first.includes(input.toLowerCase())
-      : user.location.city.includes(input.toLowerCase()));
-
+  handleOnChange = (input: string, searchType: string): void => {
     this.setState({
-      filteredUsers,
-      searchNameInput: searchType === SEARCH_NAME_TEMPLATE ? input : '',
-      searchCityInput: searchType === SEARCH_CITY_TEMPLATE ? input : ''
+      searchNameInput: searchType === SEARCH_NAME_TEMPLATE ? input.toLowerCase() : this.state.searchNameInput,
+      searchCityInput: searchType === SEARCH_CITY_TEMPLATE ? input.toLowerCase() : this.state.searchCityInput
     });
   }
 
@@ -50,44 +44,46 @@ class App extends Component<{}, State> {
   }
 
   componentDidMount(): void {
-    fetch(REQUEST_URL)
-      .then(res => res.json())
-      .then(users => this.setState({ users: users.results }))
+    axios.get(REQUEST_URL)
+      .then(res => this.setState({ users: res.data.results }))
       .catch(() => this.setState({ isLoadingFailed: true }));
   }
 
   render() {
-    const searchInput: string = this.state.searchNameInput || this.state.searchCityInput;
-    let users: JSX.Element | JSX.Element[];
+    const { users, isLoadingFailed, searchNameInput, searchCityInput }: State = this.state;
+    const searchInput: string = searchNameInput || searchCityInput;
+    const filteredUsers = users.filter((user: User) => user.name.first.includes(searchNameInput) && user.location.city.includes(searchCityInput));
 
-    if (searchInput && this.state.filteredUsers.length) {
-      users = this.getUsers(this.state.filteredUsers);
+    let renderedUsers: JSX.Element | JSX.Element[];
+
+    if (searchInput && filteredUsers.length) {
+      renderedUsers = this.getUsers(filteredUsers);
     }
-    else if (searchInput && !this.state.filteredUsers.length) {
-      users = NO_SEARCH_RESULTS_TEMPLATE;
+    else if (searchInput && !filteredUsers.length) {
+      renderedUsers = NO_SEARCH_RESULTS_TEMPLATE;
     }
     else {
-      users = this.state.users.length ? this.getUsers(this.state.users) : LOADING_TEMPLATE;
+      renderedUsers = users.length ? this.getUsers(users) : LOADING_TEMPLATE;
     }
 
     return (
       <div className="App">
         {
-          this.state.isLoadingFailed
+          isLoadingFailed
             ? LOADING_ERROR_TEMPLATE
             : (
               <React.Fragment>
                 <div className="input-wrapper">
                   <SearchBarComponent
                     searchType={SEARCH_NAME_TEMPLATE}
-                    searchInput={this.state.searchNameInput}
-                    handleOnChange={this.handleOnChange.bind(this)} />
+                    searchInput={searchNameInput}
+                    handleOnChange={this.handleOnChange} />
                   <SearchBarComponent
                     searchType={SEARCH_CITY_TEMPLATE}
-                    searchInput={this.state.searchCityInput}
-                    handleOnChange={this.handleOnChange.bind(this)} />
+                    searchInput={searchCityInput}
+                    handleOnChange={this.handleOnChange} />
                 </div>
-                {users}
+                {renderedUsers}
               </React.Fragment>
             )
         }
