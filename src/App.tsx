@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import './App.css';
-import { REQUEST_URL, SEARCH_NAME_TEMPLATE, SEARCH_CITY_TEMPLATE, User } from './App.dictionary';
+import { REQUEST_URL, SEARCH_NAME_TYPE, SEARCH_CITY_TYPE, User } from './App.dictionary';
 
 import UserComponent from './components/user/User';
 import SearchBarComponent from './components/search-bar/SearchBar';
@@ -28,8 +28,8 @@ class App extends Component<{}, State> {
 
   handleOnChange = (input: string, searchType: string): void => {
     this.setState({
-      searchNameInput: searchType === SEARCH_NAME_TEMPLATE ? input.toLowerCase() : this.state.searchNameInput,
-      searchCityInput: searchType === SEARCH_CITY_TEMPLATE ? input.toLowerCase() : this.state.searchCityInput
+      searchNameInput: searchType === SEARCH_NAME_TYPE ? input.toLowerCase() : this.state.searchNameInput,
+      searchCityInput: searchType === SEARCH_CITY_TYPE ? input.toLowerCase() : this.state.searchCityInput
     });
   }
 
@@ -43,6 +43,12 @@ class App extends Component<{}, State> {
         picture={picture.thumbnail} />);
   }
 
+  getRenderData(searchInput: string, filteredUsers: User[], users: User[]): JSX.Element | JSX.Element[] {
+    return searchInput
+      ? (filteredUsers.length ? this.getUsers(filteredUsers) : NO_SEARCH_RESULTS_TEMPLATE)
+      : (users.length ? this.getUsers(users) : LOADING_TEMPLATE);
+  }
+
   componentDidMount(): void {
     axios.get(REQUEST_URL)
       .then(res => this.setState({ users: res.data.results }))
@@ -52,19 +58,10 @@ class App extends Component<{}, State> {
   render() {
     const { users, isLoadingFailed, searchNameInput, searchCityInput }: State = this.state;
     const searchInput: string = searchNameInput || searchCityInput;
-    const filteredUsers = users.filter((user: User) => user.name.first.includes(searchNameInput) && user.location.city.includes(searchCityInput));
+    const filteredUsers: User[] = users.filter((user: User) =>
+      user.name.first.includes(searchNameInput) && user.location.city.includes(searchCityInput));
 
-    let renderedUsers: JSX.Element | JSX.Element[];
-
-    if (searchInput && filteredUsers.length) {
-      renderedUsers = this.getUsers(filteredUsers);
-    }
-    else if (searchInput && !filteredUsers.length) {
-      renderedUsers = NO_SEARCH_RESULTS_TEMPLATE;
-    }
-    else {
-      renderedUsers = users.length ? this.getUsers(users) : LOADING_TEMPLATE;
-    }
+    const renderedData: JSX.Element | JSX.Element[] = this.getRenderData(searchInput, filteredUsers, users);
 
     return (
       <div className="App">
@@ -75,15 +72,15 @@ class App extends Component<{}, State> {
               <React.Fragment>
                 <div className="input-wrapper">
                   <SearchBarComponent
-                    searchType={SEARCH_NAME_TEMPLATE}
+                    searchType={SEARCH_NAME_TYPE}
                     searchInput={searchNameInput}
                     handleOnChange={this.handleOnChange} />
                   <SearchBarComponent
-                    searchType={SEARCH_CITY_TEMPLATE}
+                    searchType={SEARCH_CITY_TYPE}
                     searchInput={searchCityInput}
                     handleOnChange={this.handleOnChange} />
                 </div>
-                {renderedUsers}
+                {renderedData}
               </React.Fragment>
             )
         }

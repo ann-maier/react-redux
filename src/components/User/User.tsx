@@ -17,4 +17,4 @@ const User = ({ name, city, age, picture }: { name: Name, city: string, age: num
     );
 };
 
-export default User;
+export default React.memo(User);
