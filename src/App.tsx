@@ -29,8 +29,8 @@ class App extends Component<{}, State> {
 
   handleOnChange(input: string, searchType: string): void {
     const filteredUsers = this.state.users.filter((user: User) => searchType === SEARCH_NAME_TEMPLATE
-      ? user.name.first.includes(input)
-      : user.location.city.includes(input));
+      ? user.name.first.includes(input.toLowerCase())
+      : user.location.city.includes(input.toLowerCase()));
 
     this.setState({
       filteredUsers,
