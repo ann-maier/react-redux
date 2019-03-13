@@ -1,27 +1,27 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import { connect } from "react-redux";
 
 import './App.css';
-import { REQUEST_URL, SEARCH_NAME_TYPE, SEARCH_CITY_TYPE, User } from './App.dictionary';
+import { SEARCH_NAME_TYPE, SEARCH_CITY_TYPE, API_CALL_REQUEST, User, Store } from './App.dictionary';
 
 import UserComponent from './components/user/User';
 import SearchBarComponent from './components/search-bar/SearchBar';
 
-const LOADING_TEMPLATE: JSX.Element = <h1>Loading...</h1>;
+// const LOADING_TEMPLATE: JSX.Element = <h1>Loading...</h1>;
 const LOADING_ERROR_TEMPLATE: JSX.Element = <h1>Cannot load data, please try again.</h1>;
 const NO_SEARCH_RESULTS_TEMPLATE: JSX.Element = <h1>Ooops...</h1>;
 
+interface Props extends Store {
+  fetchUsers: Function
+}
+
 interface State {
-  users: User[],
-  isLoadingFailed: boolean,
   searchNameInput: string,
   searchCityInput: string
 }
 
-class App extends Component<{}, State> {
+class App extends Component<Props, State> {
   state = {
-    users: [],
-    isLoadingFailed: false,
     searchNameInput: '',
     searchCityInput: ''
   };
@@ -46,17 +46,16 @@ class App extends Component<{}, State> {
   getRenderData(searchInput: string, filteredUsers: User[], users: User[]): JSX.Element | JSX.Element[] {
     return searchInput
       ? (filteredUsers.length ? this.getUsers(filteredUsers) : NO_SEARCH_RESULTS_TEMPLATE)
-      : (users.length ? this.getUsers(users) : LOADING_TEMPLATE);
+      : this.getUsers(users);
   }
 
   componentDidMount(): void {
-    axios.get(REQUEST_URL)
-      .then(res => this.setState({ users: res.data.results }))
-      .catch(() => this.setState({ isLoadingFailed: true }));
+    this.props.fetchUsers();
   }
 
   render() {
-    const { users, isLoadingFailed, searchNameInput, searchCityInput }: State = this.state;
+    const { users, isLoadingFailed }: Props = this.props;
+    const { searchNameInput, searchCityInput }: State = this.state;
     const searchInput: string = searchNameInput || searchCityInput;
     const filteredUsers: User[] = users.filter((user: User) =>
       user.name.first.includes(searchNameInput) && user.location.city.includes(searchCityInput));
@@ -89,4 +88,13 @@ class App extends Component<{}, State> {
   }
 }
 
-export default App;
+const mapStateToProps = (store: Store) => ({
+  users: store.users,
+  isLoadingFailed: store.isLoadingFailed
+});
+
+const mapDispatchToProps = (dispatch: Function) => ({
+  fetchUsers: () => dispatch({ type: API_CALL_REQUEST })
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
