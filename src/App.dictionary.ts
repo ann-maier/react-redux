@@ -20,6 +20,7 @@ export interface User {
 
 export interface Store {
   users: User[],
+  loading: boolean,
   isLoadingFailed: boolean
 }
 

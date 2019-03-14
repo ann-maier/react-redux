@@ -8,7 +8,7 @@ import { fetchData, moveLeft, moveRight } from './actions';
 import ColumnsComponent from './components/columns/Columns';
 import SearchBarComponent from './components/search-bar/SearchBar';
 
-// const LOADING_TEMPLATE: JSX.Element = <h1>Loading...</h1>;
+const LOADING_TEMPLATE: JSX.Element = <h1>Loading...</h1>;
 const LOADING_ERROR_TEMPLATE: JSX.Element = <h1>Cannot load data, please try again.</h1>;
 
 interface Props extends Store {
@@ -40,35 +40,37 @@ class App extends Component<Props, State> {
   }
 
   render() {
-    const { users, isLoadingFailed, moveLeft, moveRight }: Props = this.props;
+    const { users, loading, isLoadingFailed, moveLeft, moveRight }: Props = this.props;
     const { searchNameInput, searchCityInput }: State = this.state;
 
     return (
       <div className="App">
         {
-          isLoadingFailed
-            ? LOADING_ERROR_TEMPLATE
-            : (
-              <React.Fragment>
-                <div className="input-wrapper">
-                  <SearchBarComponent
-                    searchType={SEARCH_NAME_TYPE}
-                    searchInput={searchNameInput}
-                    handleOnChange={this.handleOnChange} />
-                  <SearchBarComponent
-                    searchType={SEARCH_CITY_TYPE}
-                    searchInput={searchCityInput}
-                    handleOnChange={this.handleOnChange} />
-                </div>
-                <ColumnsComponent
-                  users={users}
-                  searchNameInput={searchNameInput}
-                  searchCityInput={searchCityInput}
-                  moveLeft={moveLeft}
-                  moveRight={moveRight}
-                />
-              </React.Fragment>
-            )
+          loading
+            ? LOADING_TEMPLATE
+            : isLoadingFailed
+              ? LOADING_ERROR_TEMPLATE
+              : (
+                <React.Fragment>
+                  <div className="input-wrapper">
+                    <SearchBarComponent
+                      searchType={SEARCH_NAME_TYPE}
+                      searchInput={searchNameInput}
+                      handleOnChange={this.handleOnChange} />
+                    <SearchBarComponent
+                      searchType={SEARCH_CITY_TYPE}
+                      searchInput={searchCityInput}
+                      handleOnChange={this.handleOnChange} />
+                  </div>
+                  <ColumnsComponent
+                    users={users}
+                    searchNameInput={searchNameInput}
+                    searchCityInput={searchCityInput}
+                    moveLeft={moveLeft}
+                    moveRight={moveRight}
+                  />
+                </React.Fragment>
+              )
         }
       </div>
     );
@@ -77,6 +79,7 @@ class App extends Component<Props, State> {
 
 const mapStateToProps = (store: Store) => ({
   users: store.users,
+  loading: store.loading,
   isLoadingFailed: store.isLoadingFailed
 });
 

@@ -21,15 +21,16 @@ const getRenderUsers = (users: User[], moveLeft: Function, moveRight: Function):
             moveRight={moveRight} />);
 };
 
-const headers = (users: User[], moveLeft: Function, moveRight: Function): JSX.Element[] => {
-    const getColumnFilteredUsers = (index: number) => users.filter((user: User) => user.status === index);
+const getColumnFilteredUsers: Function = (users: User[], index: number): User[] => users.filter((user: User) => user.status === index);
 
+const getRenderColumns = (users: User[], moveLeft: Function, moveRight: Function): JSX.Element[] => {
     return COLUMNS_TYPES.map((column: string, index: number) => {
-        const filteredUsers: User[] = getColumnFilteredUsers(index);
+        const columnfilteredUsers: User[] = getColumnFilteredUsers(users, index);
+        
         return (
             <div key={column}>
                 <p>{column}</p>
-                {getRenderUsers(filteredUsers, moveLeft, moveRight)}
+                {getRenderUsers(columnfilteredUsers, moveLeft, moveRight)}
             </div>
         );
     });
@@ -37,21 +38,20 @@ const headers = (users: User[], moveLeft: Function, moveRight: Function): JSX.El
 
 const Columns = ({ users, searchNameInput, searchCityInput, moveLeft, moveRight } 
     : { users: User[], searchNameInput: string, searchCityInput: string, moveLeft: Function, moveRight: Function }) => {
-
-    const getRenderData = (searchInput: string, filteredUsers: User[], users: User[]): JSX.Element | JSX.Element[] => {
-        return searchInput
-            ? (filteredUsers.length ? headers(filteredUsers, moveLeft, moveRight) : NO_SEARCH_RESULTS_TEMPLATE)
-            : headers(users, moveLeft, moveRight);
-    }
-
+    
     const searchInput: string = searchNameInput || searchCityInput;
     const filteredUsers: User[] = users.filter((user: User) =>
         user.name.first.includes(searchNameInput) && user.location.city.includes(searchCityInput));
-    const renderedData: JSX.Element | JSX.Element[] = getRenderData(searchInput, filteredUsers, users);
+
+    const getRenderData = (searchInput: string, filteredUsers: User[], users: User[]): JSX.Element | JSX.Element[] => {
+        return searchInput
+            ? (filteredUsers.length ? getRenderColumns(filteredUsers, moveLeft, moveRight) : NO_SEARCH_RESULTS_TEMPLATE)
+            : getRenderColumns(users, moveLeft, moveRight);
+    }
 
     return (
         <div className="columns">
-            {renderedData}
+            {getRenderData(searchInput, filteredUsers, users)}
         </div>
     );
 };
