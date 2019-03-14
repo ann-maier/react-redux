@@ -1,10 +1,7 @@
 const REQUEST_URL: string = 'https://randomuser.me/api/?nat=gb&results=5';
 const SEARCH_NAME_TYPE: string = 'Name';
 const SEARCH_CITY_TYPE: string = 'City';
-
-const API_CALL_REQUEST: string = 'API_CALL_REQUEST';
-const API_CALL_SUCCESS: string = 'API_CALL_SUCCESS';
-const API_CALL_FAILURE: string = 'API_CALL_FAILURE';
+const COLUMNS_TYPES: string[] = [ 'APPLIED', 'INTERVIEWING', 'HIRED' ];
 
 export interface Name {
   title: string,
@@ -18,7 +15,7 @@ export interface User {
   dob: { age: number },
   id: { value: string },
   picture: { thumbnail: string },
-  status: string
+  status: number
 }
 
 export interface Store {
@@ -35,7 +32,5 @@ export {
   REQUEST_URL,
   SEARCH_NAME_TYPE,
   SEARCH_CITY_TYPE,
-  API_CALL_REQUEST,
-  API_CALL_SUCCESS,
-  API_CALL_FAILURE
+  COLUMNS_TYPES
 };

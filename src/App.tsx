@@ -2,17 +2,19 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 
 import './App.css';
-import { SEARCH_NAME_TYPE, SEARCH_CITY_TYPE, API_CALL_REQUEST, User, Store } from './App.dictionary';
+import { SEARCH_NAME_TYPE, SEARCH_CITY_TYPE, Store } from './App.dictionary';
+import { fetchData, moveLeft, moveRight } from './actions';
 
-import UserComponent from './components/user/User';
+import ColumnsComponent from './components/columns/Columns';
 import SearchBarComponent from './components/search-bar/SearchBar';
 
 // const LOADING_TEMPLATE: JSX.Element = <h1>Loading...</h1>;
 const LOADING_ERROR_TEMPLATE: JSX.Element = <h1>Cannot load data, please try again.</h1>;
-const NO_SEARCH_RESULTS_TEMPLATE: JSX.Element = <h1>Ooops...</h1>;
 
 interface Props extends Store {
-  fetchUsers: Function
+  fetchUsers: Function,
+  moveLeft: Function,
+  moveRight: Function
 }
 
 interface State {
@@ -33,34 +35,13 @@ class App extends Component<Props, State> {
     });
   }
 
-  getUsers(users: User[]): JSX.Element[] {
-    return users.map(({ name, location, dob, id, picture }: User) =>
-      <UserComponent
-        key={id.value}
-        name={name}
-        city={location.city}
-        age={dob.age}
-        picture={picture.thumbnail} />);
-  }
-
-  getRenderData(searchInput: string, filteredUsers: User[], users: User[]): JSX.Element | JSX.Element[] {
-    return searchInput
-      ? (filteredUsers.length ? this.getUsers(filteredUsers) : NO_SEARCH_RESULTS_TEMPLATE)
-      : this.getUsers(users);
-  }
-
   componentDidMount(): void {
     this.props.fetchUsers();
   }
 
   render() {
-    const { users, isLoadingFailed }: Props = this.props;
+    const { users, isLoadingFailed, moveLeft, moveRight }: Props = this.props;
     const { searchNameInput, searchCityInput }: State = this.state;
-    const searchInput: string = searchNameInput || searchCityInput;
-    const filteredUsers: User[] = users.filter((user: User) =>
-      user.name.first.includes(searchNameInput) && user.location.city.includes(searchCityInput));
-
-    const renderedData: JSX.Element | JSX.Element[] = this.getRenderData(searchInput, filteredUsers, users);
 
     return (
       <div className="App">
@@ -79,7 +60,13 @@ class App extends Component<Props, State> {
                     searchInput={searchCityInput}
                     handleOnChange={this.handleOnChange} />
                 </div>
-                {renderedData}
+                <ColumnsComponent
+                  users={users}
+                  searchNameInput={searchNameInput}
+                  searchCityInput={searchCityInput}
+                  moveLeft={moveLeft}
+                  moveRight={moveRight}
+                />
               </React.Fragment>
             )
         }
@@ -94,7 +81,9 @@ const mapStateToProps = (store: Store) => ({
 });
 
 const mapDispatchToProps = (dispatch: Function) => ({
-  fetchUsers: () => dispatch({ type: API_CALL_REQUEST })
+  fetchUsers: () => dispatch(fetchData()),
+  moveLeft: (id: string, status: number) => dispatch(moveLeft(id, status)),
+  moveRight: (id: string, status: number) => dispatch(moveRight(id, status))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

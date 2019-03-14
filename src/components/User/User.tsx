@@ -2,9 +2,10 @@ import React from 'react';
 
 import './User.css';
 
-import { Name } from '../../App.dictionary';
+import { COLUMNS_TYPES, Name } from '../../App.dictionary';
 
-const User = ({ name, city, age, picture }: { name: Name, city: string, age: number, picture: string }) => {
+const User = ({ id, name, city, age, picture, status, moveLeft, moveRight }
+    : { id: string, name: Name, city: string, age: number, picture: string, status: number, moveLeft: Function, moveRight: Function }) => {
     return (
         <div>
             <div className="user-profile">
@@ -16,8 +17,8 @@ const User = ({ name, city, age, picture }: { name: Name, city: string, age: num
                 </div>
             </div>
             <div className="user-profile-status">
-                <button>LEFT</button>
-                <button>RIGHT</button>
+                { status === 0 ? null : <button onClick={() => moveLeft(id, status)}>LEFT</button> }
+                { status === COLUMNS_TYPES.length - 1 ? null : <button onClick={() => moveRight(id, status)}>RIGHT</button> }
             </div>
         </div>
     );
