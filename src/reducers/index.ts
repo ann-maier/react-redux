@@ -8,14 +8,14 @@ const initialState: Store = {
 };
 
 const moveUser = (users: User[], id: string, status: number): User[] =>
-    users.map((user: User) => user.id.value === id ? Object.assign({}, user, { status }) : user);
+    users.map((user: User) => user.id.value === id ? { ...user, status } : user);
 
 const reducer = (state = initialState, action: Action) => {
     switch (action.type) {
         case API_CALL_REQUEST:
             return { ...state, loading: true };
         case API_CALL_SUCCESS:
-            const users: User[] = action.payload.map((user: User) => Object.assign({}, user, { status: 0 }));
+            const users: User[] = action.payload.map((user: User) => ({ ...user, status: 0 }));
             return { ...state, users, loading: false };
         case API_CALL_FAILURE:
             return { ...state, loading: false, isLoadingFailed: true };

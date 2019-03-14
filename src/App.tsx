@@ -43,34 +43,35 @@ class App extends Component<Props, State> {
     const { users, loading, isLoadingFailed, moveLeft, moveRight }: Props = this.props;
     const { searchNameInput, searchCityInput }: State = this.state;
 
+    const shouldShowMessageTemplate: boolean = loading || isLoadingFailed;
+    const dispayedMessageTemplate: JSX.Element = loading ? LOADING_TEMPLATE : LOADING_ERROR_TEMPLATE;
+
     return (
       <div className="App">
         {
-          loading
-            ? LOADING_TEMPLATE
-            : isLoadingFailed
-              ? LOADING_ERROR_TEMPLATE
-              : (
-                <React.Fragment>
-                  <div className="input-wrapper">
-                    <SearchBarComponent
-                      searchType={SEARCH_NAME_TYPE}
-                      searchInput={searchNameInput}
-                      handleOnChange={this.handleOnChange} />
-                    <SearchBarComponent
-                      searchType={SEARCH_CITY_TYPE}
-                      searchInput={searchCityInput}
-                      handleOnChange={this.handleOnChange} />
-                  </div>
-                  <ColumnsComponent
-                    users={users}
-                    searchNameInput={searchNameInput}
-                    searchCityInput={searchCityInput}
-                    moveLeft={moveLeft}
-                    moveRight={moveRight}
-                  />
-                </React.Fragment>
-              )
+          shouldShowMessageTemplate
+            ? dispayedMessageTemplate
+            : (
+              <React.Fragment>
+                <div className="input-wrapper">
+                  <SearchBarComponent
+                    searchType={SEARCH_NAME_TYPE}
+                    searchInput={searchNameInput}
+                    handleOnChange={this.handleOnChange} />
+                  <SearchBarComponent
+                    searchType={SEARCH_CITY_TYPE}
+                    searchInput={searchCityInput}
+                    handleOnChange={this.handleOnChange} />
+                </div>
+                <ColumnsComponent
+                  users={users}
+                  searchNameInput={searchNameInput}
+                  searchCityInput={searchCityInput}
+                  moveLeft={moveLeft}
+                  moveRight={moveRight}
+                />
+              </React.Fragment>
+            )
         }
       </div>
     );
@@ -83,10 +84,4 @@ const mapStateToProps = (store: Store) => ({
   isLoadingFailed: store.isLoadingFailed
 });
 
-const mapDispatchToProps = (dispatch: Function) => ({
-  fetchUsers: () => dispatch(fetchData()),
-  moveLeft: (id: string, status: number) => dispatch(moveLeft(id, status)),
-  moveRight: (id: string, status: number) => dispatch(moveRight(id, status))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps, { fetchUsers: fetchData, moveLeft, moveRight })(App);

@@ -17,8 +17,8 @@ const User = ({ id, name, city, age, picture, status, moveLeft, moveRight }
                 </div>
             </div>
             <div className="user-profile-status">
-                { status === 0 ? null : <button onClick={() => moveLeft(id, status)}>LEFT</button> }
-                { status === COLUMNS_TYPES.length - 1 ? null : <button onClick={() => moveRight(id, status)}>RIGHT</button> }
+                { status === 0 || <button onClick={() => moveLeft(id, status)}>LEFT</button> }
+                { status === COLUMNS_TYPES.length - 1 || <button onClick={() => moveRight(id, status)}>RIGHT</button> }
             </div>
         </div>
     );
