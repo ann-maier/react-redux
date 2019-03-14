@@ -25,12 +25,12 @@ const getColumnFilteredUsers: Function = (users: User[], index: number): User[] 
 
 const getRenderColumns = (users: User[], moveLeft: Function, moveRight: Function): JSX.Element[] => {
     return COLUMNS_TYPES.map((column: string, index: number) => {
-        const columnfilteredUsers: User[] = getColumnFilteredUsers(users, index);
+        const columnFilteredUsers: User[] = getColumnFilteredUsers(users, index);
         
         return (
             <div key={column}>
                 <p>{column}</p>
-                {getRenderUsers(columnfilteredUsers, moveLeft, moveRight)}
+                {getRenderUsers(columnFilteredUsers, moveLeft, moveRight)}
             </div>
         );
     });
