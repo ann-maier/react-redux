@@ -29,7 +29,7 @@ const getRenderColumns = (users: User[], moveLeft: Function, moveRight: Function
         
         return (
             <div key={column}>
-                <p>{column}</p>
+                <h3>{column}</h3>
                 {getRenderUsers(columnFilteredUsers, moveLeft, moveRight)}
             </div>
         );
