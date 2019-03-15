@@ -1,27 +1,30 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import { connect } from "react-redux";
 
 import './App.css';
-import { REQUEST_URL, SEARCH_NAME_TYPE, SEARCH_CITY_TYPE, User } from './App.dictionary';
+import { SEARCH_NAME_TYPE, SEARCH_CITY_TYPE, User, LoadingStatus, Store } from './App.dictionary';
+import { fetchData, moveLeft, moveRight } from './actions';
 
-import UserComponent from './components/user/User';
+import ColumnsComponent from './components/columns/Columns';
 import SearchBarComponent from './components/search-bar/SearchBar';
 
 const LOADING_TEMPLATE: JSX.Element = <h1>Loading...</h1>;
 const LOADING_ERROR_TEMPLATE: JSX.Element = <h1>Cannot load data, please try again.</h1>;
-const NO_SEARCH_RESULTS_TEMPLATE: JSX.Element = <h1>Ooops...</h1>;
+
+interface Props extends LoadingStatus {
+  users: User[],
+  fetchUsers: Function,
+  moveLeft: Function,
+  moveRight: Function
+}
 
 interface State {
-  users: User[],
-  isLoadingFailed: boolean,
   searchNameInput: string,
   searchCityInput: string
 }
 
-class App extends Component<{}, State> {
+class App extends Component<Props, State> {
   state = {
-    users: [],
-    isLoadingFailed: false,
     searchNameInput: '',
     searchCityInput: ''
   };
@@ -33,41 +36,22 @@ class App extends Component<{}, State> {
     });
   }
 
-  getUsers(users: User[]): JSX.Element[] {
-    return users.map(({ name, location, dob, id, picture }: User) =>
-      <UserComponent
-        key={id.value}
-        name={name}
-        city={location.city}
-        age={dob.age}
-        picture={picture.thumbnail} />);
-  }
-
-  getRenderData(searchInput: string, filteredUsers: User[], users: User[]): JSX.Element | JSX.Element[] {
-    return searchInput
-      ? (filteredUsers.length ? this.getUsers(filteredUsers) : NO_SEARCH_RESULTS_TEMPLATE)
-      : (users.length ? this.getUsers(users) : LOADING_TEMPLATE);
-  }
-
   componentDidMount(): void {
-    axios.get(REQUEST_URL)
-      .then(res => this.setState({ users: res.data.results }))
-      .catch(() => this.setState({ isLoadingFailed: true }));
+    this.props.fetchUsers();
   }
 
   render() {
-    const { users, isLoadingFailed, searchNameInput, searchCityInput }: State = this.state;
-    const searchInput: string = searchNameInput || searchCityInput;
-    const filteredUsers: User[] = users.filter((user: User) =>
-      user.name.first.includes(searchNameInput) && user.location.city.includes(searchCityInput));
+    const { users, loading, isLoadingFailed, moveLeft, moveRight }: Props = this.props;
+    const { searchNameInput, searchCityInput }: State = this.state;
 
-    const renderedData: JSX.Element | JSX.Element[] = this.getRenderData(searchInput, filteredUsers, users);
+    const shouldShowMessageTemplate: boolean = loading || isLoadingFailed;
+    const dispayedMessageTemplate: JSX.Element = loading ? LOADING_TEMPLATE : LOADING_ERROR_TEMPLATE;
 
     return (
       <div className="App">
         {
-          isLoadingFailed
-            ? LOADING_ERROR_TEMPLATE
+          shouldShowMessageTemplate
+            ? dispayedMessageTemplate
             : (
               <React.Fragment>
                 <div className="input-wrapper">
@@ -80,7 +64,13 @@ class App extends Component<{}, State> {
                     searchInput={searchCityInput}
                     handleOnChange={this.handleOnChange} />
                 </div>
-                {renderedData}
+                <ColumnsComponent
+                  users={users}
+                  searchNameInput={searchNameInput}
+                  searchCityInput={searchCityInput}
+                  moveLeft={moveLeft}
+                  moveRight={moveRight}
+                />
               </React.Fragment>
             )
         }
@@ -89,4 +79,10 @@ class App extends Component<{}, State> {
   }
 }
 
-export default App;
+const mapStateToProps = (store: Store) => ({
+  users: store.users,
+  loading: store.loadingStatus.loading,
+  isLoadingFailed: store.loadingStatus.isLoadingFailed
+});
+
+export default connect(mapStateToProps, { fetchUsers: fetchData, moveLeft, moveRight })(App);

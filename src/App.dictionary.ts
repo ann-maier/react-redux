@@ -1,6 +1,7 @@
-export const REQUEST_URL: string = 'https://randomuser.me/api/?nat=gb&results=5';
-export const SEARCH_NAME_TYPE: string = 'Name';
-export const SEARCH_CITY_TYPE: string = 'City';
+const REQUEST_URL: string = 'https://randomuser.me/api/?nat=gb&results=5';
+const SEARCH_NAME_TYPE: string = 'Name';
+const SEARCH_CITY_TYPE: string = 'City';
+const COLUMNS_TYPES: string[] = [ 'APPLIED', 'INTERVIEWING', 'HIRED' ];
 
 export interface Name {
   title: string,
@@ -13,5 +14,28 @@ export interface User {
   location: { city: string },
   dob: { age: number },
   id: { value: string },
-  picture: { thumbnail: string }
+  picture: { thumbnail: string },
+  status: number
 }
+
+export interface LoadingStatus {
+  loading: boolean,
+  isLoadingFailed: boolean
+}
+
+export interface Store {
+  users: User[],
+  loadingStatus: LoadingStatus
+}
+
+export interface Action {
+  type: string,
+  payload?: any
+}
+
+export {
+  REQUEST_URL,
+  SEARCH_NAME_TYPE,
+  SEARCH_CITY_TYPE,
+  COLUMNS_TYPES
+};
