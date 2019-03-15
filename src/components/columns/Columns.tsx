@@ -3,7 +3,7 @@ import './Columns.css';
 
 import { COLUMNS_TYPES, User } from '../../App.dictionary';
 
-import UserComponent from '../user/User';
+import UserComponent from '../User/User';
 
 const NO_SEARCH_RESULTS_TEMPLATE: JSX.Element = <h1>Ooops...</h1>;
 
