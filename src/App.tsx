@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 
 import './App.css';
-import { SEARCH_NAME_TYPE, SEARCH_CITY_TYPE, Store } from './App.dictionary';
+import { SEARCH_NAME_TYPE, SEARCH_CITY_TYPE, User, LoadingStatus, Store } from './App.dictionary';
 import { fetchData, moveLeft, moveRight } from './actions';
 
 import ColumnsComponent from './components/columns/Columns';
@@ -11,7 +11,8 @@ import SearchBarComponent from './components/search-bar/SearchBar';
 const LOADING_TEMPLATE: JSX.Element = <h1>Loading...</h1>;
 const LOADING_ERROR_TEMPLATE: JSX.Element = <h1>Cannot load data, please try again.</h1>;
 
-interface Props extends Store {
+interface Props extends LoadingStatus {
+  users: User[],
   fetchUsers: Function,
   moveLeft: Function,
   moveRight: Function
@@ -80,8 +81,8 @@ class App extends Component<Props, State> {
 
 const mapStateToProps = (store: Store) => ({
   users: store.users,
-  loading: store.loading,
-  isLoadingFailed: store.isLoadingFailed
+  loading: store.loadingStatus.loading,
+  isLoadingFailed: store.loadingStatus.isLoadingFailed
 });
 
 export default connect(mapStateToProps, { fetchUsers: fetchData, moveLeft, moveRight })(App);

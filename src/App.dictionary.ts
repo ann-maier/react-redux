@@ -18,10 +18,14 @@ export interface User {
   status: number
 }
 
-export interface Store {
-  users: User[],
+export interface LoadingStatus {
   loading: boolean,
   isLoadingFailed: boolean
+}
+
+export interface Store {
+  users: User[],
+  loadingStatus: LoadingStatus
 }
 
 export interface Action {
